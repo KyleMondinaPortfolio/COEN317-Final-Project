@@ -7,3 +7,9 @@ void Users::displayUsers(){
 		cout << endl;
 	}
 }
+void Users::displayUserNames(){
+	for (auto it = users.begin(); it != users.end(); ++it){
+		cout << (*it)->getName() << endl;
+	}
+	cout << endl;
+}
