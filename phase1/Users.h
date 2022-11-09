@@ -6,11 +6,11 @@
 
 class Users{
 	public:
-		void addUser(User *user) { users.push_back(user); }
+		void addUser(User user) { users.push_back(user); }
 		void displayUsers();
 		void displayUserNames();
 	private:
-		std::vector<User*> users;
+		std::vector<User> users;
 }; 
 
 

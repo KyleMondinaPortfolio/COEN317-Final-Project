@@ -2,8 +2,8 @@
 using namespace std;
 
 void User::display() const{
-	cout << name << endl;
-	cout << addr << endl;
-	cout << port << ends;
+	cout << name << " ";
+	cout << addr << " ";
+	cout << port << endl;
 	return;
 }
