@@ -6,28 +6,7 @@
 #include <string>
 #include <arpa/inet.h>
 #include <iostream>
-#include "Node.h"
-
-Node::Node(int g, const char *addr, int p):
-	guid(g), 
-	port(p)
-{
-	
-	if ((sockfd = socket(AF_INET, SOCK_STREAM, 0))<0){
-		perror("Node Unable to Open Socket\n");
-		exit(1);
-	}
-	std::cout<< "Node TCP Socket Successfully Opened" << std::endl;
-	
-	//memset((char *)address, 0, sizeof(*address));
-	address.sin_family = AF_INET;
-	address.sin_port = htons(port);
-
-	if (inet_pton(AF_INET, addr, &address.sin_addr)<=0){
-		perror("Node Recieved an Invalid Address\n");
-		exit(1);
-	}	
-}
+#include "Server.h"
 
 Server::Server(int g, int p, int sq, int bs):
 	Node(g, "127.0.0.1", p),
@@ -67,19 +46,4 @@ void Server::start()
 		std::cout << server_buffer << std::endl;
 	}	
 }
-
-void Client::send_msg(const char *msg)
-{
-	std::cout << "Hello?" << std::endl;	
-	if ((client_fd = connect(sockfd, (struct sockaddr*)&address, sizeof(address)))< 0){
-		perror("Node Client Recieved an Invalid Address\n");
-		exit(1);
-	}
-	std::cout << "Hello1?" << sockfd << std::endl;	
-	send(sockfd,msg,strlen(msg),0);
-	close(client_fd);
-
-}
-
-
 
