@@ -7,7 +7,7 @@ class Node{
 	public:
 		Node(int g, const char *addr, int p);
 	protected:
-		struct sockaddr_in *address;
+		struct sockaddr_in address;
 		int sockfd;			
 	private:
 		int guid;

@@ -19,11 +19,11 @@ Node::Node(int g, const char *addr, int p):
 	}
 	std::cout<< "Node TCP Socket Successfully Opened" << std::endl;
 	
-	memset((char *)address, 0, sizeof(*address));
-	address->sin_family = AF_INET;
-	address->sin_port = htons(port);
+	//memset((char *)address, 0, sizeof(*address));
+	address.sin_family = AF_INET;
+	address.sin_port = htons(port);
 
-	if (inet_pton(AF_INET, addr, &address->sin_addr)<=0){
+	if (inet_pton(AF_INET, addr, &address.sin_addr)<=0){
 		perror("Node Recieved an Invalid Address\n");
 		exit(1);
 	}	
@@ -34,7 +34,7 @@ Server::Server(int g, int p, int sq, int bs):
 	server_queue(sq),
 	server_buffer_size(bs)
 {
-	if (bind(sockfd, (struct sockaddr *)address, sizeof(*address))<0){
+	if (bind(sockfd, (struct sockaddr *)&address, sizeof(address))<0){
 		perror("Server TCP Socket Binding Failed");
 		exit(1);
 	}
@@ -56,13 +56,11 @@ void Server::start()
 	int valread;
 	char server_buffer[server_buffer_size] = {0};
 	while (1){
-		
 		if ((connfd = accept(sockfd, (struct sockaddr *)&clientAddr, &alen))<0){
 			perror("Node Server Unable to Accept Client\n");
 			exit(1);
 		}
 		std::cout << "Node Server Accepted Client " << connfd << std::endl;
-	
 		if((valread = read(connfd,server_buffer,server_buffer_size))<0){
 			std::cout << "server failed to read from client: " << connfd << std::endl;
 		}
@@ -72,7 +70,7 @@ void Server::start()
 
 void Client::send_msg(const char *msg)
 {
-	if ((client_fd = connect(sockfd, (struct sockaddr*)address, sizeof(*address)))< 0){
+	if ((client_fd = connect(sockfd, (struct sockaddr*)&address, sizeof(address)))< 0){
 		perror("Node Client Recieved an Invalid Address\n");
 		exit(1);
 	}
