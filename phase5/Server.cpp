@@ -51,7 +51,7 @@ void Server::start()
 	}	
 }
 
-void Server::start(const NodeList &nodes)
+void Server::start (const NodeList &nodes)
 {
 	int connfd;
 	struct sockaddr_in clientAddr;

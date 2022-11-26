@@ -1,6 +1,5 @@
 #ifndef NODELIST_H
 #define NODELIST_H
-#include "Server.h"
 #include "Client.h"
 #include "Message.h"
 #include <iostream>
@@ -9,6 +8,7 @@
 
 class NodeList{
 	public:
+		NodeList() {}
 		NodeList(char const *file_name);
 		void send_to_all(const Message &msg); 
 		//int send_to_node(int guid, const Message &msg);
