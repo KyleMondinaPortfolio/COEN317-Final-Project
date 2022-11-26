@@ -40,6 +40,8 @@ void Server::start()
 			exit(1);
 		}
 		std::cout << "Node Server Accepted Client " << connfd << std::endl;
+		//clear the buffer
+		memset(server_buffer,' ',server_buffer_size);
 		if((valread = read(connfd,server_buffer,server_buffer_size))<0){
 			std::cout << "server failed to read from client: " << connfd << std::endl;
 		}

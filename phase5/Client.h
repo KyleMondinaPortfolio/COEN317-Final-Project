@@ -11,7 +11,7 @@ class Client: public Node{
 		void reconnect();
 		//void reconnect();
 		bool isOnline() const {return connected;}
-		void send_msg(const std::string &msg);
+		void send_text(const std::string &msg);
 		void send_msg(const Message &msg);
 	private:
 		int client_fd;

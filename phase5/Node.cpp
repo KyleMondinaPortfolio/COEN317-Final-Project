@@ -29,6 +29,7 @@ Node::Node(int g, const char *addr, int p):
 		perror("Node Recieved an Invalid Address\n");
 		exit(1);
 	}	
+	std::cout<< "Node " << guid << " TCP Socket Address Successfully Assigned" << std::endl;
 }
 
 

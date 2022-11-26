@@ -13,9 +13,9 @@
 Client::Client(int g, const char *addr, int p):
 	Node(g, addr, p)
 {	
+	std::cout << "client: " << guid << " attempting to connect" << std::endl;
 	if ((client_fd = connect(sockfd, (struct sockaddr*)&address, sizeof(address)))< 0){
 		std::cout << "client: " << guid << "failed to connect" << std::endl;
-		//exit(1);
 		return;
 	}
 	std::cout << "client: " << guid << " successfully connected" << std::endl;
@@ -35,7 +35,7 @@ void Client::reconnect(){
 
 }
 
-void Client::send_msg(const std::string &msg)
+void Client::send_text(const std::string &msg)
 {
 	if (connected){
 	send(sockfd,msg.c_str(),msg.size(), 0);
@@ -48,13 +48,7 @@ void Client::send_msg(const Message &msg)
 {
 	if (connected){
 	std::string msg_str;
-	msg_str+=msg.sguid;
-	msg_str+="-";
-	msg_str+=msg.tguid;
-	msg_str+="-";
-	msg_str+=msg.type;
-	msg_str+="-";
-	msg_str+=msg.msg;
+	msg_str = msg.type + "-" + std::to_string(msg.sguid) + "-" + std::to_string(msg.tguid) + "-" + msg.msg + "~";
 	send(sockfd,msg_str.c_str(),msg_str.size(), 0);
 	}else{
 		std::cout << "client: " << guid << " Not Connected" << std::endl;
