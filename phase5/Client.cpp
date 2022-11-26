@@ -14,18 +14,39 @@ Client::Client(int g, const char *addr, int p):
 	Node(g, addr, p)
 {	
 	if ((client_fd = connect(sockfd, (struct sockaddr*)&address, sizeof(address)))< 0){
-		perror("Node Client Recieved an Invalid Address\n");
-		exit(1);
+		std::cout << "client: " << guid << "failed to connect" << std::endl;
+		//exit(1);
+		return;
 	}
+	std::cout << "client: " << guid << " successfully connected" << std::endl;
+	connected = true;
+	return;
+}
+
+void Client::reconnect(){
+	if ((client_fd = connect(sockfd, (struct sockaddr*)&address, sizeof(address)))< 0){
+		std::cout << "client: " << guid << "failed to connect" << std::endl;
+		//exit(1);
+		return;
+	}
+	std::cout << "client: " << guid << "successfully connected" << std::endl;
+	connected = true;
+	return;
+
 }
 
 void Client::send_msg(const std::string &msg)
 {
+	if (connected){
 	send(sockfd,msg.c_str(),msg.size(), 0);
+	}else {
+		std::cout << "client: " << guid << " Not Connected" << std::endl;
+	}
 }
 
 void Client::send_msg(const Message &msg)
 {
+	if (connected){
 	std::string msg_str;
 	msg_str+=msg.sguid;
 	msg_str+="-";
@@ -35,6 +56,9 @@ void Client::send_msg(const Message &msg)
 	msg_str+="-";
 	msg_str+=msg.msg;
 	send(sockfd,msg_str.c_str(),msg_str.size(), 0);
+	}else{
+		std::cout << "client: " << guid << " Not Connected" << std::endl;
+	}
 }
 
 
