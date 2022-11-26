@@ -73,7 +73,7 @@ void Server::start (const NodeList &nodes)
 		std::cout << "Recieved Message: " << message << std::endl;
 		//parsing the message
 		std::string delimeter = "-";
-		std::string type = message.substr(message.find(delimeter));
+		std::string type = message.substr(0,message.find(delimeter));
 		std::cout << "Message Type: " << type << std::endl;
 		
 	}	
