@@ -9,7 +9,7 @@
 #include "Server.h"
 
 Server::Server(int g, int p, int sq, int bs):
-	Node(g, "0.0.0.0", p),
+	Node(g, "127.0.0.1", p),
 	server_queue(sq),
 	server_buffer_size(bs)
 {
@@ -44,6 +44,7 @@ void Server::start()
 			std::cout << "server failed to read from client: " << connfd << std::endl;
 		}
 		std::string test(server_buffer);
+		
 		std::cout << test << std::endl;
 	}	
 }
