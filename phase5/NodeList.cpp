@@ -34,6 +34,14 @@ int NodeList::add(Client user){
 	return 1;
 }
 
+void NodeList::send_to_all(const Message &msg){
+	for (auto itr = nodes.begin(); itr != nodes.end(); ++itr){
+		itr->second.send_msg(msg);
+		//cout << itr->first << endl;
+	} 
+	
+}
+
 void NodeList::show(){
 	cout << "Users: " << endl;
 	for (auto itr = nodes.begin(); itr != nodes.end(); ++itr){

@@ -10,7 +10,7 @@
 class NodeList{
 	public:
 		NodeList(char const *file_name);
-		//int send_to_all(const Message &msg); 
+		void send_to_all(const Message &msg); 
 		//int send_to_node(int guid, const Message &msg);
 		//int removeNode(int guid);
 		int add(Client usr);
