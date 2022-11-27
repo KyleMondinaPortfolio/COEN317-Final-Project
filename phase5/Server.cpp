@@ -3,9 +3,11 @@
 #include <stdio.h>
 #include <netinet/in.h>
 #include <string.h>
-#include <string>
 #include <arpa/inet.h>
+#include <pthread.h>
+#include <string>
 #include <iostream>
+#include <thread>
 #include "Server.h"
 #include "NodeList.h"
 
@@ -28,54 +30,89 @@ Server::Server(int g, int p, int sq, int bs):
 	std::cout << "Server Now Listening To TCP Socket: " << sockfd << std::endl;	
 }
 
+void Server::nodes_handle_client(int connfd, int server_buffer_size, const NodeList &nodes){
+	int client_socket = connfd;
+	int valread;
+	char server_buffer[server_buffer_size] = {0};
+
+	while(1){
+		//clear the buffer
+		memset(server_buffer,' ',server_buffer_size);
+
+		//read the message from client socket
+		if((valread = read(client_socket,server_buffer,server_buffer_size))<0){
+			std::cout << "server failed to read from client: " << client_socket << std::endl;
+		}
+		std::string recieved_message(server_buffer);
+		std::cout << "Recieved Message: " << recieved_message << std::endl;
+
+		//parse the message
+		std::string delimeter = "-";
+		std::string type = recieved_message.substr(0,recieved_message.find(delimeter));
+		std::cout << "Message Type: " << type << std::endl;
+		if (type == "post"){
+			std::cout << "Sending Post to All Nodes" << std::endl;
+			nodes.send_to_all(recieved_message);
+		}
+	}
+}
+
+void Server::handle_client(int connfd, int server_buffer_size){
+	int client_socket = connfd;
+	int valread;
+	char server_buffer[server_buffer_size] = {0};
+
+	while(1){
+		//clear the buffer
+		memset(server_buffer,' ',server_buffer_size);
+
+		//read the message from client socket
+		if((valread = read(client_socket,server_buffer,server_buffer_size))<0){
+			std::cout << "server failed to read from client: " << client_socket << std::endl;
+		}
+		std::string recieved_message(server_buffer);
+		std::cout << "Recieved Message: " << recieved_message << std::endl;
+
+		//parse the message
+		std::string delimeter = "-";
+		std::string type = recieved_message.substr(0,recieved_message.find(delimeter));
+		std::cout << "Message Type: " << type << std::endl;
+	}
+}
+
 void Server::start()
 {
+	int connfd;
+	struct sockaddr_in clientAddr;
+	socklen_t alen;
+
 	while (1){
-		int connfd;
-		struct sockaddr_in clientAddr;
-		socklen_t alen;
-		int valread;
-		char server_buffer[server_buffer_size] = {0};
 		if ((connfd = accept(sockfd, (struct sockaddr *)&clientAddr, &alen))<0){
 			perror("Node Server Unable to Accept Client\n");
 			exit(1);
 		}
 		std::cout << "Node Server Accepted Client " << connfd << std::endl;
-		//clear the buffer
-		memset(server_buffer,' ',server_buffer_size);
-		if((valread = read(connfd,server_buffer,server_buffer_size))<0){
-			std::cout << "server failed to read from client: " << connfd << std::endl;
-		}
-		std::string message(server_buffer);
-		std::cout << message << std::endl;
+
+		//dispatch a thread to process the request
+		std::thread t(handle_client,connfd,server_buffer_size);
+		t.detach();
 	}	
 }
 
 void Server::start (const NodeList &nodes)
 {
+	int connfd;
+	struct sockaddr_in clientAddr;
+	socklen_t alen;
 	while (1){
-		int connfd;
-		struct sockaddr_in clientAddr;
-		socklen_t alen;
-		int valread;
-		char server_buffer[server_buffer_size] = {0};
 		if ((connfd = accept(sockfd, (struct sockaddr *)&clientAddr, &alen))<0){
 			perror("Node Server Unable to Accept Client\n");
 			exit(1);
 		}
 		std::cout << "Node Server Accepted Client " << connfd << std::endl;
-		//clear the buffer
-		memset(server_buffer,' ',server_buffer_size);
-		if((valread = read(connfd,server_buffer,server_buffer_size))<0){
-			std::cout << "server failed to read from client: " << connfd << std::endl;
-		}
-		std::string message(server_buffer);
-		std::cout << "Recieved Message: " << message << std::endl;
-		//parsing the message
-		std::string delimeter = "-";
-		std::string type = message.substr(0,message.find(delimeter));
-		std::cout << "Message Type: " << type << std::endl;
-		nodes.send_to_all(message);
+
+		std::thread t(nodes_handle_client,connfd,server_buffer_size,nodes);
+		t.detach();
 		
 	}	
 }
