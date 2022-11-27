@@ -30,12 +30,12 @@ Server::Server(int g, int p, int sq, int bs):
 
 void Server::start()
 {
-	int connfd;
-	struct sockaddr_in clientAddr;
-	socklen_t alen;
-	int valread;
-	char server_buffer[server_buffer_size] = {0};
 	while (1){
+		int connfd;
+		struct sockaddr_in clientAddr;
+		socklen_t alen;
+		int valread;
+		char server_buffer[server_buffer_size] = {0};
 		if ((connfd = accept(sockfd, (struct sockaddr *)&clientAddr, &alen))<0){
 			perror("Node Server Unable to Accept Client\n");
 			exit(1);
@@ -46,19 +46,19 @@ void Server::start()
 		if((valread = read(connfd,server_buffer,server_buffer_size))<0){
 			std::cout << "server failed to read from client: " << connfd << std::endl;
 		}
-		std::string test(server_buffer);
-		std::cout << test << std::endl;
+		std::string message(server_buffer);
+		std::cout << message << std::endl;
 	}	
 }
 
 void Server::start (const NodeList &nodes)
 {
-	int connfd;
-	struct sockaddr_in clientAddr;
-	socklen_t alen;
-	int valread;
-	char server_buffer[server_buffer_size] = {0};
 	while (1){
+		int connfd;
+		struct sockaddr_in clientAddr;
+		socklen_t alen;
+		int valread;
+		char server_buffer[server_buffer_size] = {0};
 		if ((connfd = accept(sockfd, (struct sockaddr *)&clientAddr, &alen))<0){
 			perror("Node Server Unable to Accept Client\n");
 			exit(1);
@@ -75,6 +75,7 @@ void Server::start (const NodeList &nodes)
 		std::string delimeter = "-";
 		std::string type = message.substr(0,message.find(delimeter));
 		std::cout << "Message Type: " << type << std::endl;
+		nodes.send_to_all(message);
 		
 	}	
 }

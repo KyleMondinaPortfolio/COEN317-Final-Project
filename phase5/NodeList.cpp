@@ -34,12 +34,16 @@ int NodeList::add(Client user){
 	return 1;
 }
 
-void NodeList::send_to_all(const Message &msg){
+void NodeList::send_to_all(const Message &msg) const{
 	for (auto itr = nodes.begin(); itr != nodes.end(); ++itr){
 		itr->second.send_msg(msg);
-		//cout << itr->first << endl;
 	} 
-	
+}
+
+void NodeList::send_to_all(const std::string &msg) const{
+	for (auto itr = nodes.begin(); itr != nodes.end(); ++itr){
+		itr->second.send_text(msg);
+	} 
 }
 
 void NodeList::show(){
