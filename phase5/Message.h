@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 
+
 class Message{
 	public:
 		Message(int sg, int tg, const std::string &t, const std::string &m):
@@ -13,5 +14,8 @@ class Message{
 		std::string msg;
 		
 };
+
+std::string format_msg(const Message &msg);
+Message parse_msg(const std::string &msg_str);
 
 #endif

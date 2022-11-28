@@ -13,18 +13,7 @@
 #include "NodeList.h"
 
 //utility function to parse a string and return a message
-Message parse_msg(const std::string &msg_str){
 
-	int first = msg_str.find("-");
-	int second = msg_str.find("-",first+1);
-	int third = msg_str.find("-",second+1);
-
-	std::string type = msg_str.substr(0,first);
-	int sguid = std::stoi(msg_str.substr(first+1,second-first-1));
-	int tguid = std::stoi(msg_str.substr(second+1,third-second-1));
-	std::string message = msg_str.substr(third+1,msg_str.find("~")-third);
-	return Message(sguid,tguid,type,message);
-}
 
 Server::Server(int g, int p, int sq, int bs):
 	Node(g, "0.0.0.0", p),
@@ -72,7 +61,9 @@ void Server::nodes_handle_client(int connfd, int server_buffer_size, const NodeL
 			nodes.send_to_all(recieved_message);
 		}else if (parsed_msg.type == "dm"){
 			std::cout << "sguid: " << parsed_msg.sguid<< " sent a message to: " << 
-			<< parsed_msg.tguid<< " saying: " << parsed_msg.msg << std::endl;
+			parsed_msg.tguid<< " saying: " << parsed_msg.msg << std::endl;
+			nodes.send_to(parsed_msg.tguid,parsed_msg);
+			//nodes.send
 		}
 	}
 }
