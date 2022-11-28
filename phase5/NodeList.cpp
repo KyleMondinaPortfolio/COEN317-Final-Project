@@ -1,7 +1,9 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <map>
 #include "NodeList.h"
+
 
 using namespace std;
 
@@ -44,6 +46,14 @@ void NodeList::send_to_all(const std::string &msg) const{
 	for (auto itr = nodes.begin(); itr != nodes.end(); ++itr){
 		itr->second.send_text(msg);
 	} 
+}
+void NodeList::send_to(int guid, const std::string &msg) const{
+	/*try{
+		const Client &client = nodes.at(guid);
+		client.send_text(msg);
+	}catch (std::out_of_range &const e){
+		std::cout << "failed to send to the client, client not in node list" <<std::endl;
+	}*/
 }
 
 void NodeList::show(){

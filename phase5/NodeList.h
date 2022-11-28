@@ -13,6 +13,8 @@ class NodeList{
 		NodeList(char const *file_name);
 		void send_to_all(const Message &msg) const; 
 		void send_to_all(const std::string &msg) const; 
+		//void send_to(int guid, const Message &msg) const;
+		void send_to(int guid, const std::string &msg) const;
 		//int send_to_node(int guid, const Message &msg);
 		//int removeNode(int guid);
 		int add(Client usr);
