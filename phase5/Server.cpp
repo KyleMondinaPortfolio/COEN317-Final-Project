@@ -43,6 +43,9 @@ void Server::nodes_handle_client(int connfd, int server_buffer_size, const NodeL
 		if((valread = read(client_socket,server_buffer,server_buffer_size))<0){
 			std::cout << "server failed to read from client: " << client_socket << std::endl;
 		}
+		if(valread == 0){
+			break;
+		}
 		std::string recieved_message(server_buffer);
 		std::cout << "Recieved Message: " << recieved_message << std::endl;
 
@@ -69,6 +72,9 @@ void Server::handle_client(int connfd, int server_buffer_size){
 		//read the message from client socket
 		if((valread = read(client_socket,server_buffer,server_buffer_size))<0){
 			std::cout << "server failed to read from client: " << client_socket << std::endl;
+		}
+		if(valread == 0){
+			break;
 		}
 		std::string recieved_message(server_buffer);
 		std::cout << "Recieved Message: " << recieved_message << std::endl;
