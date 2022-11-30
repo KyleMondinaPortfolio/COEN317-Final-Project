@@ -3,6 +3,7 @@
 #include "Server.h"
 #include "Client.h"
 #include <fstream>
+#include <thread>
 #include "Message.h"
 #include "NodeList.h"
 
@@ -16,29 +17,31 @@ int main(){
 	Client c1(1, "54.149.66.46", 8000);
 	Message msg("post",0,3,"count dankula");
 	c1.send_msg(msg);
-	
-	/*
-	//For Server 1
-	Client c1(1, "34.208.184.118", 8000);
-	Message msg(3,4,"type","I am at SCU");
-	c1.send_msg(msg);
-	*/
+
 
 	/*
-	//For Server 2
-	NodeList nodes("./Users1.txt");
+	//For Server Instance 1
+	NodeList nodes("./Users.txt");
 	nodes.show();
 	Server s(2,8000,100,1000);
-	s.start(nodes);
+	std::thread t1(&Server::node_start,&s,&nodes);
+	std::thread t2(&NodeList::monitor_failures,&nodes);
+	t1.join();
+	t2.join();
 	*/
 
 	/*
-	//For Server 3
+	//For Instance 2
+	Server s(2,8000,100,1000);
+	s.start();
+	*/
+
+	/*
+	//For Instance 3
 	Server s(3,8000,100,1000);
 	s.start();
 	*/
 
-	//std::string type = recieved_message.substr(0,recieved_message.find(delimeter));
 	return 0;
 }
 

@@ -56,10 +56,18 @@ void NodeList::send_to(int guid, Message msg){
 
 void NodeList::monitor_failures(){
 	while(1){
+		std::cout << "Running Failure Monitors" << std::endl;
 		for (auto itr = nodes.begin(); itr != nodes.end(); ++itr){
 			bool is_connected = itr->second.check_connection();
-			if (is_connected){}
-			else{ itr->second.try_connect(); }
+			if (is_connected){
+				std::cout << "Client: " << itr->second.name() << " Connected" << std::endl; 
+				Message ping("ping",0,0,"ping~");
+				itr->second.send_msg(ping);
+			}
+			else{ 
+				std::cout << "Client: " << itr->second.name() << " Not Connected" << std::endl; 
+				itr->second.try_connect(); 
+			}
 		}
 		std::this_thread::sleep_for(chrono::seconds(3));
 	}
