@@ -14,7 +14,6 @@
 
 //utility function to parse a string and return a message
 
-
 Server::Server(int g, int p, int sq, int bs):
 	Node(g, "0.0.0.0", p),
 	server_queue(sq),
@@ -64,7 +63,6 @@ void Server::nodes_handle_client(int connfd, int server_buffer_size, NodeList *n
 			std::cout << "sguid: " << parsed_msg.msguid()<< " sent a message to: " << 
 			parsed_msg.mtguid()<< " saying: " << parsed_msg.mmsg() << std::endl;
 			nodes->send_to(parsed_msg.mtguid(),parsed_msg);
-			//nodes.send
 		}
 	}
 }
@@ -114,7 +112,7 @@ void Server::start()
 	}	
 }
 
-void Server::start (NodeList *nodes)
+void Server::node_start (NodeList *nodes)
 {
 	int connfd;
 	struct sockaddr_in clientAddr;
@@ -131,3 +129,4 @@ void Server::start (NodeList *nodes)
 		
 	}	
 }
+

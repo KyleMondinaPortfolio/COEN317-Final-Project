@@ -14,6 +14,7 @@ class NodeList{
 		void send_to_all(Message msg); 
 		void send_to_all(std::string msg); 
 		void send_to(int guid, Message msg);
+		void monitor_failures();
 		//int removeNode(int guid);
 		int add(Client usr);
 		void show();

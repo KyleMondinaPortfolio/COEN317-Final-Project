@@ -2,6 +2,8 @@
 #include <fstream>
 #include <sstream>
 #include <map>
+#include <thread>
+#include <chrono>
 #include "NodeList.h"
 
 
@@ -50,6 +52,17 @@ void NodeList::send_to_all(std::string msg){
 void NodeList::send_to(int guid, Message msg){
 		Client &client = nodes.at(guid);
 		client.send_msg(msg);
+}
+
+void NodeList::monitor_failures(){
+	while(1){
+		for (auto itr = nodes.begin(); itr != nodes.end(); ++itr){
+			bool is_connected = itr->second.check_connection();
+			if (is_connected){}
+			else{ itr->second.try_connect(); }
+		}
+		std::this_thread::sleep_for(chrono::seconds(3));
+	}
 }
 
 void NodeList::show(){

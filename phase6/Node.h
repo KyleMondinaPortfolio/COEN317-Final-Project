@@ -8,12 +8,14 @@ class Node{
 	public:
 		Node(int g,const char *addr, int p);
 		int name() const {return guid;}
+		void restart_port();
 	protected:
 		struct sockaddr_in address;
 		int sockfd;			
 		int guid;
 	private:
 		int port;
+		std::string addr_string;
 };
 
 #endif

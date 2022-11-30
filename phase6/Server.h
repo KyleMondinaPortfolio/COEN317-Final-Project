@@ -9,7 +9,7 @@ class Server: public Node{
 	public:
 		Server(int g, int p, int sq, int bs);
 		void start();
-		void start(NodeList *nodes);
+		void node_start(NodeList *nodes);
 		static void nodes_handle_client(int connfd, int server_buffer_size, NodeList *nodes);
 		static void handle_client(int connfd, int server_buffer_size);
 	private:
