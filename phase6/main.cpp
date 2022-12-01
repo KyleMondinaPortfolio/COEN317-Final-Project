@@ -13,10 +13,20 @@
 ;
 
 int main(){
-	
+/*	
 	Client c1(1, "54.149.66.46", 8000);
 	Message msg("post",0,3,"count dankula");
 	c1.send_msg(msg);
+*/
+
+	Client c1(1, "54.149.66.46", 8000);
+	while (1){
+		std::string message;
+		while(std::getline(std::cin,message)){
+			Message msg = parse_msg(message); 
+			c1.send_msg(msg);
+		}
+	}
 
 
 	/*
