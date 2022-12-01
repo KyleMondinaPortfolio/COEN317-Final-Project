@@ -9,6 +9,7 @@
 #include "Message.h"
 #include "NodeList.h"
 #include "MessageIDBuffer.h"
+#include "UDPServer.h"
 
 void user_interface(NodeList *friends,Client *server, bool *server_online){
 	while(1){
@@ -95,9 +96,8 @@ int main(){
 		return 0;
 	}else{
 		std::cout << "Server Type Not Specified" <<std::endl;
-		MessageIDBuffer mbuffer;
-		mbuffer.add(3);
-		std::cout << mbuffer.contains(3) << std::endl;
+		UDPServer userver(1,7000,1000);
+		userver.start();
 		return 0;
 	}
 	
