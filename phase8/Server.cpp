@@ -93,7 +93,6 @@ void Server::handle_client(int connfd, int server_buffer_size){
 		Message parsed_msg = parse_msg(recieved_message);
 		if (parsed_msg.mtype() == "ping"){
 			//No Action Necessary, Message Sent was a Failure Detection
-			return;
 		}
 		std::cout << "Message Type: " << parsed_msg.mtype() << std::endl;
 		std::cout << "Recieved Message: " << recieved_message << std::endl;

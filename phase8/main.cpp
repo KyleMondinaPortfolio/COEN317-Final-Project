@@ -36,7 +36,7 @@ int main(){
 		Client c1(1, "54.149.66.46", 8000);
 		//Client c1(1, "34.208.184.118", 8000);
 		//Client c1(1, "54.202.116.197", 8000);
-		Message msg("post",0,3,"tig of bitties");
+		Message msg("dm",0,3,"tig of bitties");
 		c1.send_msg(msg);
 		return 0;
 	}
