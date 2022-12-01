@@ -67,7 +67,7 @@ void Client::send_text(std::string msg)
 {
 	if (connected){
 		//std::cout << "Attempting to Send Text to Client: " << guid  << std::endl;
-		if((send(sockfd,msg.c_str(),msg.size(), 0)) < MSG_NOSIGNAL){
+		if((send(sockfd,msg.c_str(),msg.size(), MSG_NOSIGNAL)) < 0){
 			//std::cout << "Client: " << guid << " Failed to Send Text " << std::endl;
 			if (errno == ECONNRESET){
 				std::cout << "ECONNRESET SIGNAL" << std::endl;

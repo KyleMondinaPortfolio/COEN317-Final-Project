@@ -21,6 +21,10 @@ Node::Node(int g, const char *addr, int p):
 	}
 	std::cout<< "Node " << guid << " TCP Socket Successfully Opened" << std::endl;
 	
+	if (setsockopt(sockfd,SOL_SOCKET,SO_REUSEADDR | SO_REUSEPORT,&opt,sizeof(opt))){
+		perror("setsockopt: ");
+	}
+	
 	//memset((char *)address, 0, sizeof(*address));
 	address.sin_family = AF_INET;
 	address.sin_port = htons(port);

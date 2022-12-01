@@ -65,7 +65,7 @@ void Server::handle_client_node(int connfd, int server_buffer_size, NodeList *no
 			nodes->send_to(parsed_msg.mtguid(),parsed_msg);
 		}else if (parsed_msg.mtype() == "ping"){
 			//No Action Necessary, Message Sent was a Failure Detection
-			return;
+			//return;
 		}
 		std::cout << "Recieved Message: " << recieved_message << std::endl;
 	}
@@ -145,16 +145,19 @@ void Server::start_server_online(bool *server_online)
 	socklen_t alen;
 	while (1){
 		std::cout << "Server Ready to Accept Again" << std::endl;
+		std::cout << "Code Before the Accept" << std::endl;
 		if ((connfd = accept(sockfd, (struct sockaddr *)&clientAddr, &alen))<0){
+			std::cout << "Accept Failed" << std::endl;
 			perror("Node Server Unable to Accept Client\n");
 			exit(1);
 		}
+		std::cout << "Code After Accept" << std::endl;
 		std::cout << "Node Server Accepted Client " << connfd << std::endl;
 		if (*server_online == true){
 			std::cout << "Central Server is Online, using COSN Handler" << std::endl;
-			handle_client(connfd,server_buffer_size);
-		//	std::thread t(handle_client,this,connfd,server_buffer_size);
-		//	t.detach();
+			//handle_client(connfd,server_buffer_size);
+			std::thread t(handle_client,connfd,server_buffer_size);
+			t.detach();
 		}else{
 			std::cout << "Central Server is Offline, using P2P Handler" << std::endl;
 		}

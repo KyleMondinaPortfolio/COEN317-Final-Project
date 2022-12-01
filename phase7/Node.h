@@ -16,6 +16,7 @@ class Node{
 	private:
 		int port;
 		std::string addr_string;
+		int opt = 1;
 };
 
 #endif
