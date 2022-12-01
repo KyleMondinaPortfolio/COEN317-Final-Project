@@ -45,40 +45,34 @@ int main(){
 		bool server_online = false;
 		Client central_server(1, "54.149.66.46", 9000);
 		Server self_main(guid,8000,100,1000);
-		Server self_heart(guid,9000,100,1000);
 
 		//Failure Detector for Central Server
 		std::mutex monitor_mtx;
 		std::thread t1(&Client::monitor_failure,&central_server,true,3,&monitor_mtx,&server_online);
 
-		//Background Listening Process
-		//For Failure Detection
-		std::thread t2(&Server::start_server_online, &self_heart, &server_online);
 		//Main Listener
-		std::thread t3(&Server::start, &self_main);
+		std::thread t2(&Server::start, &self_main);
 
 		t1.join();
 		t2.join();
-		t3.join();
 		return 0;
 
 	}else if (server_type == 2){
 		//Central Server Code
 		NodeList nodes("./Users.txt");
-		NodeList heart_beats("./Detect.txt");
 		nodes.show();
-		heart_beats.show();
-	
 		Server self_main(1,8000,100,1000);
 		Server self_heart(1,9000,100,1000);
 
 		//for port 8000
+		//Main Server
 		std::thread t1(&Server::start_node,&self_main,&nodes);
-		//for port 9000
-		std::thread t2(&Server::start,&self_heart);
-
 		//Nodes Failure Detector
-		std::thread t3(&NodeList::monitor_failures,&heart_beats,false,3);
+		std::thread t2(&NodeList::monitor_failures,&nodes,false,3);
+
+		//for port 9000
+		//heart beat server: used for client to check the status of the server
+		std::thread t3(&Server::start,&self_heart);
 		
 		t1.join();
 		t2.join();
