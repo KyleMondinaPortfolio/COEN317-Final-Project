@@ -8,9 +8,11 @@
 #include <string>
 #include <iostream>
 #include <thread>
+#include <mutex>
 #include "Server.h"
 #include "Message.h"
 #include "NodeList.h"
+#include "MessageIDBuffer.h"
 
 //utility function to parse a string and return a message
 
@@ -103,6 +105,54 @@ void Server::handle_client_node(int connfd, int server_buffer_size, NodeList *no
 	}
 }
 
+void Server::handle_client_friends(int connfd, int server_buffer_size, NodeList *friends, std::mutex *mtx, MessageIDBuffer *mbuffer){
+	int client_socket = connfd;
+	int valread;
+	char server_buffer[server_buffer_size] = {0};
+
+	while(1){
+		//clear the buffer
+		memset(server_buffer,' ',server_buffer_size);
+
+		//read the message from client socket
+		if((valread = read(client_socket,server_buffer,server_buffer_size))<0){
+			std::cout << "server failed to read from client: " << client_socket << std::endl;
+		}
+		if(valread == 0){
+			break;
+		}
+
+		//parse the message
+		std::string raw_recieved_message(server_buffer);
+		std::string recieved_message = raw_recieved_message.substr(0,raw_recieved_message.find("~")+1);
+		Message parsed_msg = parse_msg(recieved_message);
+
+		/*if (parsed_msg.mtype() != "ping"){
+			std::cout << "Message Type: " << parsed_msg.mtype() << std::endl;
+			std::cout << "Recieved Message: " << recieved_message << std::endl;
+		}*/
+
+		if (parsed_msg.mtype() == "post"){
+			//check if the message has been sent to you already, if it has, discard it else add to buffer and propogate it
+			//message id will be stored in tguid
+			mtx->lock();
+			int msg_id = parsed_msg.mtguid();
+			bool is_duplicate = mbuffer->contains(msg_id);
+			if (!is_duplicate){
+				mbuffer->add(msg_id);
+				std::cout << "Message New, Gossip throughout the P2P Network" << std::endl;
+				std::cout << "Recieved Message: " << recieved_message << std::endl;
+				friends->send_to_all_except(parsed_msg.msguid(),recieved_message);
+			}else{
+				std::cout << "Duplicate Message Recieved" << std::endl;
+				std::cout << "Recieved Message: " << recieved_message << std::endl;
+			} 
+			mtx->unlock();
+		}
+	}
+}
+
+
 void Server::start()
 {
 	int connfd;
@@ -139,6 +189,25 @@ void Server::start_node(NodeList *nodes)
 		
 	}	
 }
+
+void Server::start_friends(NodeList *friends,std::mutex *mtx, MessageIDBuffer *mbuffer)
+{
+	int connfd;
+	struct sockaddr_in clientAddr;
+	socklen_t alen;
+	while (1){
+		if ((connfd = accept(sockfd, (struct sockaddr *)&clientAddr, &alen))<0){
+			perror("Node Server Unable to Accept Client\n");
+			exit(1);
+		}
+		std::cout << "Node Server Accepted Client " << connfd << std::endl;
+
+		std::thread t(handle_client_friends,connfd,server_buffer_size,friends,mtx,mbuffer);
+		t.detach();
+		
+	}	
+}
+
 
 void Server::start_server_online(bool *server_online)
 {
