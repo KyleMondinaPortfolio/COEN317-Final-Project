@@ -144,6 +144,7 @@ void Server::start_server_online(bool *server_online)
 	struct sockaddr_in clientAddr;
 	socklen_t alen;
 	while (1){
+		std::cout << "Server Ready to Accept Again" << std::endl;
 		if ((connfd = accept(sockfd, (struct sockaddr *)&clientAddr, &alen))<0){
 			perror("Node Server Unable to Accept Client\n");
 			exit(1);
@@ -151,8 +152,9 @@ void Server::start_server_online(bool *server_online)
 		std::cout << "Node Server Accepted Client " << connfd << std::endl;
 		if (*server_online == true){
 			std::cout << "Central Server is Online, using COSN Handler" << std::endl;
-			std::thread t(handle_client,connfd,server_buffer_size);
-			t.detach();
+			handle_client(connfd,server_buffer_size);
+		//	std::thread t(handle_client,this,connfd,server_buffer_size);
+		//	t.detach();
 		}else{
 			std::cout << "Central Server is Offline, using P2P Handler" << std::endl;
 		}

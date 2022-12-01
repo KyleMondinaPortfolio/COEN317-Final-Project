@@ -29,8 +29,8 @@ void user_interface(Client *server, bool *server_online){
 
 int main(){
 
-	int guid = 2;
-	int server_type = 1;
+	int guid = 0;
+	int server_type = 0;
 
 	if (server_type == 0){
 		Client c1(1, "54.149.66.46", 8000);
