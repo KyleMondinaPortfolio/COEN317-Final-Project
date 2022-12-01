@@ -31,13 +31,13 @@ void user_interface(NodeList *friends,Client *server, bool *server_online){
 int main(){
 
 	int guid = 0;
-	int server_type = 1;
+	int server_type = 0;
 
 	if (server_type == 0){
 		Client c1(1, "54.149.66.46", 8000);
-		//Client c1(1, "34.208.184.118", 8000);
+		//Client c1(1, "34.208.184.118", 7000);
 		//Client c1(1, "54.202.116.197", 8000);
-		Message msg("post",0,3,"tig of bitties");
+		Message msg("post",0,3,"test multicast");
 		c1.send_msg(msg);
 		return 0;
 	}
