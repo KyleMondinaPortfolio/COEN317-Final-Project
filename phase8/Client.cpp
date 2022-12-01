@@ -24,7 +24,7 @@ void Client::try_connect()
 {
 	//std::cout << "Attempting to Connect To Client" << guid  << std::endl;
 	if ((client_fd = connect(sockfd, (struct sockaddr*)&address, sizeof(address)))< 0){
-		perror("Problem Occured While Attempting to Connect to Client"); 
+		//perror("Problem Occured While Attempting to Connect to Client"); 
 		//std::cout << "Failed to Connect to Client: " << guid << std::endl;
 		if (errno == ENOTSOCK || errno == EBADF){
 			restart_port();	
