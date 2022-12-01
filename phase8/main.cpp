@@ -10,8 +10,10 @@
 #include "NodeList.h"
 #include "MessageIDBuffer.h"
 #include "UDPServer.h"
+#include "UDPClient.h"
+#include "UDPNodeList.h"
 
-void user_interface(NodeList *friends,Client *server, bool *server_online){
+void user_interface(UDPNodeList *friends,Client *server, bool *server_online){
 	while(1){
 		//blocking parsing user input
 		std::string user_input;
@@ -35,10 +37,12 @@ int main(){
 	int server_type = 0;
 
 	if (server_type == 0){
-		Client c1(1, "54.149.66.46", 8000);
+		//Client c1(1, "54.149.66.46", 8000);
 		//Client c1(1, "34.208.184.118", 7000);
 		//Client c1(1, "54.202.116.197", 8000);
+		UDPClient c1(1, "54.149.66.46", 7000);
 		Message msg("post",0,3,"test multicast");
+		
 		c1.send_msg(msg);
 		return 0;
 	}
@@ -48,9 +52,9 @@ int main(){
 		Client central_server_heartbeat(1, "54.149.66.46", 9000);
 		Client central_server(1, "54.149.66.46", 8000);
 		Server self_main(guid,8000,100,1000);
-		Server self_friends(guid,7000,100,1000);
+		UDPServer self_friends(guid,7000,1000);
 
-		NodeList friends("./FriendsOf1.txt");
+		UDPNodeList friends("./FriendsOf1.txt");
 		
 
 		//Failure Detector for Central Server
@@ -63,7 +67,7 @@ int main(){
 		//P2P Listener
 		MessageIDBuffer mbuffer;	
 		std::mutex buffer_mtx; 
-		std::thread t4(&Server::start_friends, &self_friends,&friends,&buffer_mtx,&mbuffer);
+		self_friends.start_friends(&friends,&buffer_mtx,&mbuffer);
 
 		//User Interface
 		std::thread t3(user_interface,&friends,&central_server,&server_online);

@@ -44,3 +44,42 @@ void UDPServer::start(){
 	}
 }
 
+void UDPServer::start_friends(UDPNodeList *friends, std::mutex *mtx,MessageIDBuffer *mbuffer){
+	while (1){
+		int n;
+		struct sockaddr_in clientAddr;
+		socklen_t alen;
+		char server_buffer[server_buffer_size] = {0};
+
+		n = recvfrom(sockfd, (char *)server_buffer, server_buffer_size, MSG_WAITALL, (struct sockaddr*)&clientAddr, &alen); 
+
+		std::string raw_recieved_message(server_buffer);
+		std::string recieved_message = raw_recieved_message.substr(0,raw_recieved_message.find("~")+1);
+		Message parsed_msg = parse_msg(recieved_message);
+
+		std::cout << "Recieved Message" << recieved_message << std::endl;
+		//print the thing, later parse it
+
+		if (parsed_msg.mtype() == "post"){
+			//check if the message has been sent to you already, if it has, discard it else add to buffer and propogate it
+			//message id will be stored in tguid
+			mtx->lock();
+			int msg_id = parsed_msg.mtguid();
+			bool is_duplicate = mbuffer->contains(msg_id);
+			if (!is_duplicate){
+				mbuffer->add(msg_id);
+				std::cout << "Message New, Gossip throughout the P2P Network" << std::endl;
+				std::cout << "Recieved Message: " << recieved_message << std::endl;
+				friends->send_to_all_except(parsed_msg.msguid(),recieved_message);
+			}else{
+				std::cout << "Duplicate Message Recieved" << std::endl;
+				std::cout << "Recieved Message: " << recieved_message << std::endl;
+			} 
+			mtx->unlock();
+		}
+
+	}
+}
+
+
+

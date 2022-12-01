@@ -29,10 +29,10 @@ void UDPClient::send_text(std::string msg)
 	
 }
 void UDPClient::send_msg(Message msg){
+	std::cout << "Did this Fire?" << std::endl;
 	std::string msg_str = format_msg(msg);
-	if(sendto(sockfd,msg_str.c_str(),msg_str.size(),MSG_NOSIGNAL,(struct sockaddr*)&address, sizeof(address))<0){
-		std::cout << "Encountered Problem Sending to UDP Node" << name() << std::endl;
-	}
+	sendto(sockfd,msg_str.c_str(),msg_str.size(),MSG_NOSIGNAL,(struct sockaddr*)&address, sizeof(address));
+	std::cout << "Did We Send the Message" << std::endl;
 }
 
 

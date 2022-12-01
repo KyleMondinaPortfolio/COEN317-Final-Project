@@ -5,7 +5,7 @@
 #include <mutex>
 #include "Node.h"
 #include "UDPNode.h"
-#include "NodeList.h"
+#include "UDPNodeList.h"
 #include "MessageIDBuffer.h"
 
 
@@ -13,6 +13,7 @@ class UDPServer: public UDPNode{
 	public:
 		UDPServer(int g, int p, int bs);
 		void start();
+		void start_friends(UDPNodeList *friends, std::mutex *mtx,MessageIDBuffer *mbuffer);
 		//void start_friends(NodeList *friends,std::mutex *mtx, MessageIDBuffer *mbuffer);
 		//static void handle_client_friends(int connfd, int server_buffer_size, NodeList *friends, std::mutex *mtx, MessageIDBuffer *mbuffer);
 	private:

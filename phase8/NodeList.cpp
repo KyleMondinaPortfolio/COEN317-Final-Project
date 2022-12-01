@@ -5,6 +5,7 @@
 #include <thread>
 #include <chrono>
 #include "NodeList.h"
+#include "Client.h"
 
 
 using namespace std;
@@ -41,14 +42,46 @@ int NodeList::add(Client user){
 void NodeList::send_to_all(Message msg){
 	for (auto itr = nodes.begin(); itr != nodes.end(); ++itr){
 		itr->second.send_msg(msg);
-	} 
+	}
 }
 
 void NodeList::send_to_all(std::string msg){
 	for (auto itr = nodes.begin(); itr != nodes.end(); ++itr){
 		itr->second.send_text(msg);
-	} 
+	}
 }
+
+void NodeList::send_to(int guid, Message msg){
+	Client &client = nodes.at(guid);
+	client.send_msg(msg);
+}
+
+
+void NodeList::monitor_failures(bool invisible, int cooldown){
+        while(1){
+                if (!invisible){
+                        cout << "Running Failure Monitors" << endl;
+                }
+                for (auto itr = nodes.begin(); itr != nodes.end(); ++itr){
+                        bool is_connected = itr->second.check_connection();
+                        if (is_connected){
+                                if (!invisible){
+                                cout << "Client: " << itr->second.name() << " Connected" << endl;
+                                }
+                                Message ping("ping",0,0,"ping~");
+                                itr->second.send_msg(ping);
+                        }
+                        else{
+                                if (!invisible){
+                                        cout << "Client: " << itr->second.name() << " Not Connected" << endl;
+                                }
+                                itr->second.try_connect();
+                        }
+                }
+                this_thread::sleep_for(chrono::seconds(cooldown));
+        }
+}
+
 
 void NodeList::send_to_all_except(int guid, std::string msg){
 	for (auto itr = nodes.begin(); itr != nodes.end(); ++itr){
@@ -58,62 +91,7 @@ void NodeList::send_to_all_except(int guid, std::string msg){
 	} 
 }
 
-void NodeList::send_to(int guid, Message msg){
-		Client &client = nodes.at(guid);
-		client.send_msg(msg);
-}
 
-
-void NodeList::monitor_failures(bool invisible, int cooldown){
-	while(1){
-		if (!invisible){
-			cout << "Running Failure Monitors" << endl;
-		}
-		for (auto itr = nodes.begin(); itr != nodes.end(); ++itr){
-			bool is_connected = itr->second.check_connection();
-			if (is_connected){
-				if (!invisible){
-				cout << "Client: " << itr->second.name() << " Connected" << endl; 
-				}
-				Message ping("ping",0,0,"ping~");
-				itr->second.send_msg(ping);
-			}
-			else{ 
-				if (!invisible){
-					cout << "Client: " << itr->second.name() << " Not Connected" << endl; 
-				}
-				itr->second.try_connect(); 
-			}
-		}
-		this_thread::sleep_for(chrono::seconds(cooldown));
-	}
-}
-/*
-void NodeList::monitor_failures_whileup(bool invisible, int cooldown, bool *server_online){
-	while(*server_online == true){
-		if (!invisible){
-			cout << "Running Failure Monitors" << endl;
-		}
-		for (auto itr = nodes.begin(); itr != nodes.end(); ++itr){
-			bool is_connected = itr->second.check_connection();
-			if (is_connected){
-				if (!invisible){
-				cout << "Client: " << itr->second.name() << " Connected" << endl; 
-				}
-				Message ping("ping",0,0,"ping~");
-				itr->second.send_msg(ping);
-			}
-			else{ 
-				if (!invisible){
-					cout << "Client: " << itr->second.name() << " Not Connected" << endl; 
-				}
-				itr->second.try_connect(); 
-			}
-		}
-		this_thread::sleep_for(chrono::seconds(cooldown));
-	}
-}
-*/
 
 void NodeList::show(){
 	cout << "Users: " << endl;
