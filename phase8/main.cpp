@@ -36,25 +36,30 @@ int main(){
 		Client c1(1, "54.149.66.46", 8000);
 		//Client c1(1, "34.208.184.118", 8000);
 		//Client c1(1, "54.202.116.197", 8000);
-		Message msg("post",0,3,"tig of bitties");
+		Message msg("dm",0,3,"tig of bitties");
 		c1.send_msg(msg);
 		return 0;
 	}
 	else if (server_type == 1){
 		//Node Client Code
 		bool server_online = false;
-		Client central_server(1, "54.149.66.46", 9000);
+		Client central_server_heartbeat(1, "54.149.66.46", 9000);
+		Client central_server(1, "54.149.66.46", 8000);
 		Server self_main(guid,8000,100,1000);
 
 		//Failure Detector for Central Server
 		std::mutex monitor_mtx;
-		std::thread t1(&Client::monitor_failure,&central_server,true,3,&monitor_mtx,&server_online);
+		std::thread t1(&Client::monitor_failure,&central_server_heartbeat,true,3,&monitor_mtx,&server_online);
 
 		//Main Listener
 		std::thread t2(&Server::start, &self_main);
 
+		//User Interface
+		std::thread t3(user_interface,&central_server,&server_online);
+
 		t1.join();
 		t2.join();
+		t3.join();
 		return 0;
 
 	}else if (server_type == 2){

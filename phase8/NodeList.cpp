@@ -49,10 +49,20 @@ void NodeList::send_to_all(std::string msg){
 		itr->second.send_text(msg);
 	} 
 }
+
+void NodeList::send_to_all_except(int guid, std::string msg){
+	for (auto itr = nodes.begin(); itr != nodes.end(); ++itr){
+		if (itr->second.name() != guid){
+			itr->second.send_text(msg);
+		}
+	} 
+}
+
 void NodeList::send_to(int guid, Message msg){
 		Client &client = nodes.at(guid);
 		client.send_msg(msg);
 }
+
 
 void NodeList::monitor_failures(bool invisible, int cooldown){
 	while(1){

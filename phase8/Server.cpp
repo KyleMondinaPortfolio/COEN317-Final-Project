@@ -93,7 +93,7 @@ void Server::handle_client_node(int connfd, int server_buffer_size, NodeList *no
 		if (parsed_msg.mtype() == "post"){
 			std::cout << "Message Type: " << parsed_msg.mtype() << std::endl;
 			std::cout << "Sending Post to All Nodes" << std::endl;
-			nodes->send_to_all(recieved_message);
+			nodes->send_to_all_except(parsed_msg.msguid(),recieved_message);
 		}else if (parsed_msg.mtype() == "dm"){
 			std::cout << "Message Type: " << parsed_msg.mtype() << std::endl;
 			std::cout << "sguid: " << parsed_msg.msguid()<< " sent a message to: " << 
