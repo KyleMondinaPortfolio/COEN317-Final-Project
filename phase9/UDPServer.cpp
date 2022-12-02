@@ -60,28 +60,44 @@ void UDPServer::start_friends(UDPNodeList *friends, std::mutex *mtx,MessageIDBuf
 		Message parsed_msg = parse_msg(recieved_message);
 
 		std::cout << "Recieved Message" << recieved_message << std::endl;
+		
+		std::string type = parsed_msg.mtype();
+		int r_sguid = parsed_msg.msguid();
+		int r_tguid = parsed_msg.mtguid();
+		int r_ts = parsed_msg.mtimestamp();
+		int r_mid = parsed_msg.mid();
+		std::string mmsg = parsed_msg.mmsg();
+		
 		//print the thing, later parse it
 
-		if (parsed_msg.mtype() == "post"){
+		if (type == "post"){
 			//check if the message has been sent to you already, if it has, discard it else add to buffer and propogate it
 			//message id will be stored in tguid
 			mtx->lock();
-			int msg_id = parsed_msg.mtguid();
-			bool is_duplicate = mbuffer->contains(msg_id);
+
+			bool is_duplicate = mbuffer->contains(r_mid);
 			if (!is_duplicate){
-				mbuffer->add(msg_id);
+				mbuffer->add(r_mid);
 				std::cout << "Message New, Gossip throughout the P2P Network" << std::endl;
 				std::cout << "Recieved Message: " << recieved_message << std::endl;
-				friends->send_to_all_except(parsed_msg.msguid(),recieved_message);
+
+				int ts = 3;
+				//update the message's source
+				Message new_message(type,guid,r_tguid,ts,r_mid,mmsg);
+				std::string str_new_message = format_msg(new_message); 
+				friends->send_to_all_except(r_sguid,str_new_message);
 			}else{
 				std::cout << "Duplicate Message Recieved" << std::endl;
 				std::cout << "Recieved Message: " << recieved_message << std::endl;
 			} 
+
 			mtx->unlock();
 		}
 
 	}
 }
+
+
 
 
 
