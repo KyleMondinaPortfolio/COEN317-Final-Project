@@ -27,6 +27,7 @@ void user_interface(UDPNodeList *friends,Client *server, bool *server_online, Ti
 		std::string message_type;
 		std::string user_message;
 		int user_id = guid;
+		std::string stid;
 		int target_id;
 		int message_id = rand();
 		int time_stamp = rand();
@@ -37,7 +38,8 @@ void user_interface(UDPNodeList *friends,Client *server, bool *server_online, Ti
 		std::getline(std::cin,message_type);
 
 		std::cout << "Enter Target's ID" << std::endl; 
-		std::cin >> target_id;
+		std::getline(std::cin,stid);
+		target_id = std::stoi(stid);
 
 		std::cout << "Enter Message You Want to Broadcast Over the Network" << std::endl; 
 		std::getline(std::cin,user_message);
