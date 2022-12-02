@@ -34,12 +34,11 @@ UDPNodeList::UDPNodeList(char const *file_name){
 	}
 	users_file.close();
 }
+
 int UDPNodeList::add(UDPClient user){
 	nodes.insert({user.name(),user});	
 	return 1;
 }
-
-
 
 void UDPNodeList::send_to_all_except(int guid, std::string msg){
 	for (auto itr = nodes.begin(); itr != nodes.end(); ++itr){
@@ -55,9 +54,6 @@ void UDPNodeList::send_to_all_except(int guid, Message msg){
 		}
 	} 
 }
-
-
-
 
 void UDPNodeList::show(){
 	cout << "Users: " << endl;

@@ -68,7 +68,7 @@ void NodeList::monitor_failures(bool invisible, int cooldown){
                                 if (!invisible){
                                 cout << "Client: " << itr->second.name() << " Connected" << endl;
                                 }
-                                Message ping("ping",0,0,"ping~");
+                                Message ping("ping",0,0,0,0,"ping~");
                                 itr->second.send_msg(ping);
                         }
                         else{

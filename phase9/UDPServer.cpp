@@ -37,6 +37,7 @@ void UDPServer::start(){
 		socklen_t alen;
 		char server_buffer[server_buffer_size] = {0};
 		n = recvfrom(sockfd, (char *)server_buffer, server_buffer_size, MSG_WAITALL, (struct sockaddr*)&clientAddr, &alen); 
+		if (n<0){std::cout << "n got < 0" <<std::endl;}
 		std::string raw_recieved_message(server_buffer);
 		std::string recieved_message = raw_recieved_message.substr(0,raw_recieved_message.find("~")+1);
 		std::cout << "Recieved Message" << recieved_message << std::endl;
@@ -52,6 +53,7 @@ void UDPServer::start_friends(UDPNodeList *friends, std::mutex *mtx,MessageIDBuf
 		char server_buffer[server_buffer_size] = {0};
 
 		n = recvfrom(sockfd, (char *)server_buffer, server_buffer_size, MSG_WAITALL, (struct sockaddr*)&clientAddr, &alen); 
+		if (n<0){std::cout << "n got < 0" <<std::endl;}
 
 		std::string raw_recieved_message(server_buffer);
 		std::string recieved_message = raw_recieved_message.substr(0,raw_recieved_message.find("~")+1);

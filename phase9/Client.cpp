@@ -49,7 +49,7 @@ void Client::monitor_failure(bool invisible, int cooldown, std::mutex *mtx,bool 
 			if (!invisible){ std::cout << name() << " Connected" << std::endl; }
 			*client_online = true;
 			if (!invisible){std::cout << "Is Client Online? " << *client_online << std::endl;}
-			Message ping("ping",0,0,"ping~");
+			Message ping("ping",0,0,0,0,"ping~");
 			send_msg(ping);
 		}else{
 			if (!invisible){ std::cout << name() << " Not Connected" << std::endl; }

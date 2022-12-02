@@ -1,5 +1,6 @@
 #include <netinet/in.h>
 #include <iostream>
+#include <cstdlib>
 #include "Server.h"
 #include "Client.h"
 #include <fstream>
@@ -16,33 +17,49 @@
 #include "Interests.h"
 	
 int guid = 0;
+int server_type = 5;
 
 void user_interface(UDPNodeList *friends,Client *server, bool *server_online, TimeStamp *ts, std::mutex *mtx){
+
 	while(1){
 		//blocking parsing user input
-		std::string user_input;
-		std::getline(std::cin,user_input);
-		std::cout << "User Input: " << std::endl;
-		std::cout << user_input << std::endl;
-		std::cout << "Central Server State: " << *server_online << std::endl;
-		if (*server_online == true){
-			std::cout << "Sending User Input to Central Server" << std::endl;
-			Message msg = parse_msg(user_input);
-			server->send_msg(msg);
-		}else{
+	
+		std::string message_type;
+		std::string user_message;
+		int user_id = guid;
+		int target_id;
+		int message_id = rand();
+		int time_stamp = rand();
 
+		std::cout << "----User Interface-----" << std::endl; 
+
+		std::cout << "Enter Type of Message You Want" << std::endl; 
+		std::getline(std::cin,message_type);
+
+		std::cout << "Enter Target's ID" << std::endl; 
+		std::cin >> target_id;
+
+		std::cout << "Enter Message You Want to Broadcast Over the Network" << std::endl; 
+		std::getline(std::cin,user_message);
+
+		Message formatted_message(message_type,user_id,target_id,time_stamp,message_id,user_message);
+
+		if (*server_online == true){
+			std::cout << "Server is Online" << std::endl;
+			std::cout << "Sending User Input to Central Server" << std::endl;
+			server->send_msg(formatted_message);
+		}else{
+			std::cout << "Server is Offline" << std::endl;
 			std::cout << "Multicasting User Input to P2P Network" << std::endl;
 			int ts_store;
 			ts->send(&ts_store,mtx);
 			std::cout << ts_store << std::endl;
-			friends->send_to_all_except(guid,user_input);
+			friends->send_to_all_except(guid,formatted_message);
 		}
 	}
 }
 
 int main(){
-
-	int server_type = 5;
 
 	if (server_type == 0){
 		Client c1(1, "54.149.66.46", 8000);
@@ -51,7 +68,7 @@ int main(){
 		//UDPClient c1(1, "54.149.66.46", 7000);
 		//UDPClient c1(1, "54.202.92.56", 7000);
 		//UDPClient c1(1, "35.92.125.224", 7000);
-		Message msg("post",0,3,"test multicast");
+		Message msg("post",0,0,0,0,"test multicast");
 		
 		c1.send_msg(msg);
 		return 0;
@@ -64,9 +81,14 @@ int main(){
 		Server self_main(guid,8000,100,1000);
 		UDPServer self_friends(guid,7000,1000);
 
-		UDPNodeList friends("./FriendsOf1.txt");
+		std::string file_name("./FriendsOf");
+		file_name.append(std::to_string(guid));
+		file_name.append(".txt");
+		std::cout << file_name << std::endl;
+		UDPNodeList friends(file_name.c_str());
+		//UDPNodeList friends("./FriendsOf3.txt");
+		//UDPNodeList friends("./FriendsOf4.txt");
 		
-
 		//Failure Detector for Central Server
 		std::mutex monitor_mtx;
 		std::thread t1(&Client::monitor_failure,&central_server_heartbeat,true,3,&monitor_mtx,&server_online);
@@ -83,7 +105,6 @@ int main(){
 		MessageIDBuffer mbuffer;	
 		std::mutex buffer_mtx; 
 		self_friends.start_friends(&friends,&buffer_mtx,&mbuffer);
-
 
 		t1.join();
 		t2.join();
@@ -112,23 +133,28 @@ int main(){
 		t3.join();
 		return 0;
 	}else{
-		UDPNodeList friends("./FriendsOf1.txt");
-		std::cout << "Server Type Not Specified" <<std::endl;
-		std::mutex tsmtx;
-		int value;
-		TimeStamp ts;
-		ts.send(&value,&tsmtx);
-		std::cout << "Time Stamp Value shoudl be 1, Actual: " << value << std::endl;	
-		ts.send(&value,&tsmtx);
-		std::cout << "Time Stamp Value shoudl be 2, Actual: " << value << std::endl;	
-		ts.recieve(&value,&tsmtx,5); 
-		std::cout << "Time Stamp Value shoudl be 6, Actual: " << value << std::endl;	
+		//UDPNodeList friends("./FriendsOf1.txt");
+		//std::cout << "Server Type Not Specified" <<std::endl;
+		//std::mutex tsmtx;
+		//int value;
+		//TimeStamp ts;
+		//ts.send(&value,&tsmtx);
+		//std::cout << "Time Stamp Value shoudl be 1, Actual: " << value << std::endl;	
+		//ts.send(&value,&tsmtx);
+		//std::cout << "Time Stamp Value shoudl be 2, Actual: " << value << std::endl;	
+		//ts.recieve(&value,&tsmtx,5); 
+		//std::cout << "Time Stamp Value shoudl be 6, Actual: " << value << std::endl;	
 		
-		std::string example("1+cookies,2+cookies|1+cookies,2+cookies|1+cookies,2+cookies");
-		Interests interest(example);
-		interest.show();
-		interest.format();
+		//std::string example("1+cookies,2+cookies|1+cookies,2+cookies|1+cookies,2+cookies");
+		//Interests interest(example);
+		//interest.show();
+		//interest.format();
+		//std::string msg("post-1-2-cookies are the best~");
+		//Message message = parse_msg(msg);
+		//std::cout << message.mmsg() << std::endl; 
 		
+		//std::string reform = format_msg(message);
+		//std::cout << reform << std::endl;
 		
 		return 0;
 	}
