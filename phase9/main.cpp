@@ -19,7 +19,7 @@
 int guid = 0;
 int server_type = 0;
 
-void user_interface(UDPNodeList *friends,Client *server, bool *server_online, TimeStamp *ts, std::mutex *mtx){
+void user_interface(UDPNodeList *friends,Client *server, bool *server_online, TimeStamp *ts, std::mutex *mtx, MessageIDBuffer *mbuffer){
 
 	while(1){
 		//blocking parsing user input
@@ -53,6 +53,7 @@ void user_interface(UDPNodeList *friends,Client *server, bool *server_online, Ti
 		std::cout << "Message that will be sent" <<std::endl;
 		std::cout << format_msg(formatted_message) << std::endl;
 		std::cout << "Message ID: " << formatted_message.mid() <<std::endl;
+		mbuffer->add(message_id);
 
 		if (*server_online == true){
 			std::cout << "Server is Online" << std::endl;
@@ -108,13 +109,14 @@ int main(){
 		//Main Listener
 		std::thread t2(&Server::start, &self_main);
 	
+		MessageIDBuffer mbuffer;	
+
 		//User Interface
 		TimeStamp ts;
 		std::mutex tsmtx;
-		std::thread t3(user_interface,&friends,&central_server,&server_online,&ts,&tsmtx);
+		std::thread t3(user_interface,&friends,&central_server,&server_online,&ts,&tsmtx,&mbuffer);
 
 		//P2P Listener
-		MessageIDBuffer mbuffer;	
 		std::mutex buffer_mtx; 
 		self_friends.start_friends(&friends,&buffer_mtx,&mbuffer);
 
