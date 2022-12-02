@@ -12,6 +12,8 @@
 #include "UDPServer.h"
 #include "UDPClient.h"
 #include "UDPNodeList.h"
+	
+int guid = 0;
 
 void user_interface(UDPNodeList *friends,Client *server, bool *server_online){
 	while(1){
@@ -27,22 +29,22 @@ void user_interface(UDPNodeList *friends,Client *server, bool *server_online){
 			server->send_msg(msg);
 		}else{
 			std::cout << "Multicasting User Input to P2P Network" << std::endl;
+			friends->send_to_all_except(guid,user_input);
 		}
 	}
 }
 
 int main(){
 
-	int guid = 0;
 	int server_type = 0;
 
 	if (server_type == 0){
-		//Client c1(1, "54.149.66.46", 8000);
+		Client c1(1, "54.149.66.46", 8000);
 		//UDPClient c1(1, "34.208.184.118", 7000);
 		//UDPClient c1(1, "54.202.116.197", 8000);
 		//UDPClient c1(1, "54.149.66.46", 7000);
 		//UDPClient c1(1, "54.202.92.56", 7000);
-		UDPClient c1(1, "35.92.125.224", 7000);
+		//UDPClient c1(1, "35.92.125.224", 7000);
 		Message msg("post",0,3,"test multicast");
 		
 		c1.send_msg(msg);
@@ -66,13 +68,14 @@ int main(){
 		//Main Listener
 		std::thread t2(&Server::start, &self_main);
 	
+		//User Interface
+		std::thread t3(user_interface,&friends,&central_server,&server_online);
+
 		//P2P Listener
 		MessageIDBuffer mbuffer;	
 		std::mutex buffer_mtx; 
 		self_friends.start_friends(&friends,&buffer_mtx,&mbuffer);
 
-		//User Interface
-		std::thread t3(user_interface,&friends,&central_server,&server_online);
 
 		t1.join();
 		t2.join();
