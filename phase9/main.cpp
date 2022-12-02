@@ -50,6 +50,9 @@ void user_interface(UDPNodeList *friends,Client *server, bool *server_online, Ti
 		//increment the timer time stamp, make it print in booth the user interface and the UDP reciever
 		
 		Message formatted_message(message_type,user_id,target_id,time_stamp,message_id,user_message);
+		std::cout << "Message that will be sent" <<std::endl;
+		std::cout << format_msg(formatted_message) << std::endl;
+		std::cout << "Message ID: " << formatted_message.mid() <<std::endl;
 
 		if (*server_online == true){
 			std::cout << "Server is Online" << std::endl;

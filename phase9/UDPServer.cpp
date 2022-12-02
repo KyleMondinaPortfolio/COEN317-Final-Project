@@ -60,6 +60,7 @@ void UDPServer::start_friends(UDPNodeList *friends, std::mutex *mtx,MessageIDBuf
 		Message parsed_msg = parse_msg(recieved_message);
 
 		std::cout << "Recieved Message" << recieved_message << std::endl;
+		std::cout << "Message ID: " << parsed_msg.mid() << std::endl;
 		
 		std::string type = parsed_msg.mtype();
 		int r_sguid = parsed_msg.msguid();
