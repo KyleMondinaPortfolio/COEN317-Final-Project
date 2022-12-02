@@ -45,7 +45,7 @@ void UDPServer::start(){
 	}
 }
 
-void UDPServer::start_friends(UDPNodeList *friends, std::mutex *mtx,MessageIDBuffer *mbuffer){
+void UDPServer::start_friends(UDPNodeList *friends, std::mutex *mtx,MessageIDBuffer *mbuffer, TimeStamp *ts, std::mutex *tsmtx){
 	while (1){
 		int n;
 		struct sockaddr_in clientAddr;
@@ -69,6 +69,11 @@ void UDPServer::start_friends(UDPNodeList *friends, std::mutex *mtx,MessageIDBuf
 		int r_mid = parsed_msg.mid();
 		std::string mmsg = parsed_msg.mmsg();
 		
+		//update your timestamp
+		int time_stamp;
+		ts->recieve(&time_stamp, tsmtx, r_ts);
+
+		std::cout << "Current Time Stamp Is" << time_stamp << std::endl;
 		//print the thing, later parse it
 
 		if (type == "post"){
@@ -82,9 +87,10 @@ void UDPServer::start_friends(UDPNodeList *friends, std::mutex *mtx,MessageIDBuf
 				std::cout << "Message New, Gossip throughout the P2P Network" << std::endl;
 				std::cout << "Recieved Message: " << recieved_message << std::endl;
 
-				int ts = 3;
+				//update your time stamp
+				ts->send(&time_stamp,tsmtx);
 				//update the message's source
-				Message new_message(type,guid,r_tguid,ts,r_mid,mmsg);
+				Message new_message(type,guid,r_tguid,time_stamp,r_mid,mmsg);
 				std::string str_new_message = format_msg(new_message); 
 				friends->send_to_all_except(r_sguid,str_new_message);
 			}else{

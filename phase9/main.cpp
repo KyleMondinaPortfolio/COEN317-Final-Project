@@ -30,7 +30,6 @@ void user_interface(UDPNodeList *friends,Client *server, bool *server_online, Ti
 		std::string stid;
 		int target_id;
 		int message_id = rand();
-		int time_stamp = rand();
 
 		std::cout << "----User Interface-----" << std::endl; 
 
@@ -44,16 +43,15 @@ void user_interface(UDPNodeList *friends,Client *server, bool *server_online, Ti
 		std::cout << "Enter Message You Want to Broadcast Over the Network" << std::endl; 
 		std::getline(std::cin,user_message);
 
-		//add the changing of the thingy
-		//fix the back sending
-		//send it properly, aka, add a changing of the source guid to not repeat yoruself
-		//increment the timer time stamp, make it print in booth the user interface and the UDP reciever
+		int time_stamp;
+		ts->send(&time_stamp,mtx);
 		
 		Message formatted_message(message_type,user_id,target_id,time_stamp,message_id,user_message);
 		std::cout << "Message that will be sent" <<std::endl;
 		std::cout << format_msg(formatted_message) << std::endl;
 		std::cout << "Message ID: " << formatted_message.mid() <<std::endl;
 		mbuffer->add(message_id);
+		std::cout << "Message Time Stamp " << formatted_message.mtimestamp() <<std::endl;
 
 		if (*server_online == true){
 			std::cout << "Server is Online" << std::endl;
@@ -63,10 +61,7 @@ void user_interface(UDPNodeList *friends,Client *server, bool *server_online, Ti
 		}else{
 			std::cout << "Server is Offline" << std::endl;
 			std::cout << "Multicasting User Input to P2P Network" << std::endl;
-			int ts_store;
-			ts->send(&ts_store,mtx);
 			//add a time stamp send
-			std::cout << ts_store << std::endl;
 			friends->send_to_all_except(guid,formatted_message);
 		}
 	}
@@ -118,7 +113,7 @@ int main(){
 
 		//P2P Listener
 		std::mutex buffer_mtx; 
-		self_friends.start_friends(&friends,&buffer_mtx,&mbuffer);
+		self_friends.start_friends(&friends,&buffer_mtx,&mbuffer,&ts,&tsmtx);
 
 		t1.join();
 		t2.join();
