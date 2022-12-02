@@ -22,10 +22,9 @@ UDPClient::UDPClient(int g, const char *addr, int p):
 void UDPClient::send_text(std::string msg) 
 {
 
-	socklen_t alen;
-	if(sendto(sockfd,msg.c_str(),msg.size(),MSG_NOSIGNAL,(struct sockaddr*)&address, sizeof(address))<0){
-		std::cout << "Encountered Problem Sending to UDP Node" << name() << std::endl;
-	}
+	std::cout << "Did this Fire?" << std::endl;
+	sendto(sockfd,msg.c_str(),msg.size(),MSG_NOSIGNAL,(struct sockaddr*)&address, sizeof(address));
+	std::cout << "Did We Send the Message" << std::endl;
 	
 }
 void UDPClient::send_msg(Message msg){

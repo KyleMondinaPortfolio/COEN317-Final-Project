@@ -38,9 +38,11 @@ int main(){
 
 	if (server_type == 0){
 		//Client c1(1, "54.149.66.46", 8000);
-		//Client c1(1, "34.208.184.118", 7000);
-		//Client c1(1, "54.202.116.197", 8000);
-		UDPClient c1(1, "54.149.66.46", 7000);
+		//UDPClient c1(1, "34.208.184.118", 7000);
+		//UDPClient c1(1, "54.202.116.197", 8000);
+		//UDPClient c1(1, "54.149.66.46", 7000);
+		//UDPClient c1(1, "54.202.92.56", 7000);
+		UDPClient c1(1, "35.92.125.224", 7000);
 		Message msg("post",0,3,"test multicast");
 		
 		c1.send_msg(msg);
