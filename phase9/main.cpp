@@ -44,6 +44,11 @@ void user_interface(UDPNodeList *friends,Client *server, bool *server_online, Ti
 		std::cout << "Enter Message You Want to Broadcast Over the Network" << std::endl; 
 		std::getline(std::cin,user_message);
 
+		//add the changing of the thingy
+		//fix the back sending
+		//send it properly, aka, add a changing of the source guid to not repeat yoruself
+		//increment the timer time stamp, make it print in booth the user interface and the UDP reciever
+		
 		Message formatted_message(message_type,user_id,target_id,time_stamp,message_id,user_message);
 
 		if (*server_online == true){
@@ -56,6 +61,7 @@ void user_interface(UDPNodeList *friends,Client *server, bool *server_online, Ti
 			std::cout << "Multicasting User Input to P2P Network" << std::endl;
 			int ts_store;
 			ts->send(&ts_store,mtx);
+			//add a time stamp send
 			std::cout << ts_store << std::endl;
 			friends->send_to_all_except(guid,formatted_message);
 		}
