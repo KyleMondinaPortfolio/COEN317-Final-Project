@@ -17,7 +17,7 @@
 #include "Interests.h"
 	
 int guid = 0;
-int server_type = 5;
+int server_type = 0;
 
 void user_interface(UDPNodeList *friends,Client *server, bool *server_online, TimeStamp *ts, std::mutex *mtx){
 
@@ -49,7 +49,8 @@ void user_interface(UDPNodeList *friends,Client *server, bool *server_online, Ti
 		if (*server_online == true){
 			std::cout << "Server is Online" << std::endl;
 			std::cout << "Sending User Input to Central Server" << std::endl;
-			server->send_msg(formatted_message);
+			
+			server->send_text(format_msg(formatted_message));
 		}else{
 			std::cout << "Server is Offline" << std::endl;
 			std::cout << "Multicasting User Input to P2P Network" << std::endl;
