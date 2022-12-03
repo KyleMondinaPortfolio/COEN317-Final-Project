@@ -104,6 +104,69 @@ void UDPServer::start_friends(UDPNodeList *friends, std::mutex *mtx,MessageIDBuf
 	}
 }
 
+void UDPServer::start_mutual(int *reqts, UDPNodeList *friends, TimeStamp *ts, std::mutex *tsmtx, std::string *state, std::mutex *smtx, int *replies, std::mutex *rmtx, std::queue<int> *mq, std::mutex *mqmtx){
+	while (1){
+		int n;
+		struct sockaddr_in clientAddr;
+		socklen_t alen;
+		char server_buffer[server_buffer_size] = {0};
+
+		n = recvfrom(sockfd, (char *)server_buffer, server_buffer_size, MSG_WAITALL, (struct sockaddr*)&clientAddr, &alen); 
+		if (n<0){std::cout << "n got < 0" <<std::endl;}
+
+		std::string raw_recieved_message(server_buffer);
+		std::string recieved_message = raw_recieved_message.substr(0,raw_recieved_message.find("~")+1);
+		Message parsed_msg = parse_msg(recieved_message);
+
+		std::cout << "Recieved Message" << recieved_message << std::endl;
+		std::cout << "Message ID: " << parsed_msg.mid() << std::endl;
+		
+		std::string type = parsed_msg.mtype();
+		int r_sguid = parsed_msg.msguid();
+		int r_tguid = parsed_msg.mtguid();
+		int r_ts = parsed_msg.mtimestamp();
+		int r_mid = parsed_msg.mid();
+		std::string mmsg = parsed_msg.mmsg();
+		
+		//update your timestamp
+		int time_stamp;
+		ts->recieve(&time_stamp, tsmtx, r_ts);
+		std::cout << "Current Time Stamp Is" << time_stamp << std::endl;
+
+		if (type == "REQUEST"){
+			smtx->lock();
+			std::string cur_state = *state;
+			smtx->unlock();
+			
+			//if state = released simply send stuff
+			if (cur_state == "RELEASED"){
+				std::string reptype("REPLY");
+				ts->send(&time_stamp, tsmtx);
+				Message reply_message(reptype, guid, 0, time_stamp, 0, reptype);
+				friends->send_to(r_sguid,reply_message);
+				
+			//state = request and sender < own reqts reply
+			}else if (cur_state == "REQUESTING" && (r_ts<*reqts)){
+				std::string reptype("REPLY");
+				ts->send(&time_stamp, tsmtx);
+				Message reply_message(reptype, guid, 0, time_stamp, 0, reptype);
+				friends->send_to(r_sguid,reply_message);
+			//else que add
+			}else{
+				mqmtx->lock();
+				mq->push(r_sguid);
+				mqmtx->unlock();
+			}
+		}else if (type == "REPLY"){
+			//increment the counter
+			rmtx->lock();
+			*replies+=1;
+			rmtx->unlock();
+		}	
+	}
+}
+
+
 
 
 

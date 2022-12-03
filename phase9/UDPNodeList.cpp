@@ -40,6 +40,12 @@ int UDPNodeList::add(UDPClient user){
 	return 1;
 }
 
+void UDPNodeList::send_to_all(Message msg){
+	for (auto itr = nodes.begin(); itr != nodes.end(); ++itr){
+			itr->second.send_msg(msg);
+	} 
+}
+
 void UDPNodeList::send_to_all_except(int guid, std::string msg){
 	for (auto itr = nodes.begin(); itr != nodes.end(); ++itr){
 		if (itr->second.name() != guid){
@@ -53,6 +59,10 @@ void UDPNodeList::send_to_all_except(int guid, Message msg){
 			itr->second.send_msg(msg);
 		}
 	} 
+}
+void UDPNodeList::send_to(int guid, Message msg){
+	UDPClient &client = nodes.at(guid);
+	client.send_msg(msg);
 }
 
 void UDPNodeList::show(){

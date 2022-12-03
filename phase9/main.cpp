@@ -4,6 +4,7 @@
 #include "Server.h"
 #include "Client.h"
 #include <fstream>
+#include <queue>
 #include <chrono>
 #include <thread>
 #include <mutex>
@@ -65,6 +66,73 @@ void user_interface(UDPNodeList *friends,Client *server, bool *server_online, Ti
 			friends->send_to_all_except(guid,formatted_message);
 		}
 	}
+}
+
+void enter_sc( int *reqts, std::mutex *smtx, std::string *state, int *replies, std::mutex *rmtx, TimeStamp *ts, std::mutex *tsmtx, std::queue<int> *mq, std::mutex *qmtx, UDPNodeList *mnodes){
+	//Set State to Requesting
+	smtx->lock();
+	*state = "REQUESTING";
+	smtx->unlock();
+
+	//Set Replies to 0
+	rmtx->lock();
+	*replies = 0;
+	rmtx->unlock();
+
+	//set the time stamp
+	int time_stamp;
+	//set and save the request time stamp, will be used by UDP Server
+	ts->send(reqts, tsmtx);
+	
+	//Set Request to All Peer Nodes
+	std::string reqtype("REQUEST");
+	
+	//message id duplication might send bugs
+	Message request_message(reqtype, guid, 0, *reqts, 0, reqtype);
+	mnodes->send_to_all(request_message);
+
+	std::cout << "Waiting To Enter CS"<< std::endl;
+	while (1){
+		std::cout << "Waiting for Replies"<< std::endl;
+		rmtx->lock();
+		int rpls = *replies;
+		std::cout << rpls << std::endl;
+		rmtx->unlock();
+		if (rpls >= 2){
+			std::cout << "Recieved All Replies" << std::endl;
+			break;
+		}
+	}
+
+	std::cout << "Entered CS" << std::endl;
+	smtx->lock();
+	*state = "EXECUTING";
+	smtx->unlock();
+
+	while(1){
+		std::string user_input;
+		std::getline(std::cin,user_input);
+		if (user_input == "EXIT"){break;}
+	}
+	std::cout << "Exited Now Releasing"<< std::endl;
+
+	//Set Lock To Released
+	smtx->lock();
+	*state = "RELEASED";
+	smtx->unlock();
+	ts->send(&time_stamp,tsmtx);
+
+	//SEND Reply to Everyone
+	std::string reptype("REPLY");
+	qmtx->lock();
+	while(!mq->empty()){
+		ts->send(&time_stamp, tsmtx);
+		int peer = mq->front();
+		std::cout << "Sending Reply Message to Peer: " << peer << std::endl;
+		Message reply_message(reptype, guid, 0, time_stamp, 0, reptype);
+		mnodes->send_to(peer,reply_message);
+	}
+	qmtx->unlock();
 }
 
 int main(){
@@ -141,8 +209,49 @@ int main(){
 		t2.join();
 		t3.join();
 		return 0;
+	}else if (server_type == 3){
+	
+		//create the peer udp sockets
+		std::string file_name("./FriendsOf");
+		file_name.append(std::to_string(guid));
+		file_name.append(".txt");
+		std::cout << file_name << std::endl;
+		UDPNodeList friends(file_name.c_str());
+		
+		//create the UDP Listening Server
+		UDPServer self_friends(guid,7000,1000);
+
+		//Creating the global variables
+		int reqts;
+		std::string state("RELEASED");
+		std::mutex smtx;
+		int replies;
+		std::mutex rmtx;
+		TimeStamp ts;
+		std::mutex tsmtx;
+		std::queue<int> mq;
+		std::mutex qmtx;
+		
+		std::thread t1(&UDPServer::start_mutual,&self_friends,&reqts, &friends, &ts, &tsmtx, &state, &smtx, &replies, &rmtx, &mq, &qmtx);
+		while(1){
+			std::string user_input;
+			std::getline(std::cin,user_input);
+			if (user_input == "ENTER"){
+				enter_sc(&reqts,&smtx,&state,&replies,&rmtx,&ts,&tsmtx,&mq,&qmtx,&friends);
+			}
+			else if (user_input == "EXIT"){break;}
+		}
+		t1.join();
+
+		
+		
 	}else{
-		//UDPNodeList friends("./FriendsOf1.txt");
+			
+		return 0;
+	}
+}
+
+	//UDPNodeList friends("./FriendsOf1.txt");
 		//std::cout << "Server Type Not Specified" <<std::endl;
 		//std::mutex tsmtx;
 		//int value;
@@ -164,9 +273,5 @@ int main(){
 		
 		//std::string reform = format_msg(message);
 		//std::cout << reform << std::endl;
-		
-		return 0;
-	}
-	
-}
+
 
