@@ -102,6 +102,7 @@ void enter_sc( int *reqts, std::mutex *smtx, std::string *state, int *replies, s
 			std::cout << "Recieved All Replies" << std::endl;
 			break;
 		}
+                std::this_thread::sleep_for(std::chrono::seconds(cooldown));
 	}
 
 	std::cout << "Entered CS" << std::endl;
@@ -129,6 +130,7 @@ void enter_sc( int *reqts, std::mutex *smtx, std::string *state, int *replies, s
 		ts->send(&time_stamp, tsmtx);
 		int peer = mq->front();
 		std::cout << "Sending Reply Message to Peer: " << peer << std::endl;
+		mq->pop();
 		Message reply_message(reptype, guid, 0, time_stamp, 0, reptype);
 		mnodes->send_to(peer,reply_message);
 	}
@@ -212,14 +214,14 @@ int main(){
 	}else if (server_type == 3){
 	
 		//create the peer udp sockets
-		std::string file_name("./FriendsOf");
+		std::string file_name("./Mutual");
 		file_name.append(std::to_string(guid));
 		file_name.append(".txt");
 		std::cout << file_name << std::endl;
 		UDPNodeList friends(file_name.c_str());
 		
 		//create the UDP Listening Server
-		UDPServer self_friends(guid,7000,1000);
+		UDPServer self_friends(guid,6000,1000);
 
 		//Creating the global variables
 		int reqts;
