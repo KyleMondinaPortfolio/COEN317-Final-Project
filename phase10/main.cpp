@@ -68,7 +68,7 @@ void user_interface(Interests *interests,UDPNodeList *friends,Client *server, bo
 		int time_stamp;
 		ts->send(&time_stamp,mtx);
 		
-		if (message_type == "irequest"){
+		if (message_type == "iwrite"){
 			user_message = interests->format();
 		}
 

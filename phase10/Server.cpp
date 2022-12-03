@@ -90,7 +90,7 @@ void Server::handle_client_interests(int connfd, int server_buffer_size, Interes
 			std::cout << "Message Type: " << parsed_msg.mtype() << std::endl;
 			std::cout << "Recieved Message: " << recieved_message << std::endl;
 		}
-		if (parsed_msg.mtype() != "iupdate"){
+		if (parsed_msg.mtype() == "iupdate"){
 			Interests temp(parsed_msg.mmsg());
 			*interests = temp; 
 			interests->show();
@@ -176,8 +176,12 @@ void Server::handle_client_node_interests(int connfd, int server_buffer_size, No
 			std::cout << "sguid: " << parsed_msg.msguid()<< " sent a message to: " << 
 			parsed_msg.mtguid()<< " saying: " << parsed_msg.mmsg() << std::endl;
 			nodes->send_to(parsed_msg.mtguid(),parsed_msg);
-		}else if (parsed_msg.mtype() == "test"){
+		}else if (parsed_msg.mtype() == "iwrite"){
 			Interests recieved_i(parsed_msg.mmsg()); 
+			*interests = recieved_i;
+			std::string update("iupdate");
+			Message formatted_message(update,4,4,4,4,interests->format());
+			nodes->send_to(parsed_msg.msguid(),formatted_message);
 			
 		}else if (parsed_msg.mtype() == "irequest"){
 			std::string update("iupdate");
